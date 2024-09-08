@@ -6,6 +6,7 @@ local DefaultConfig = {
 		MarginRight = "2.5cm",
 		MarginTop = "2.5cm",
 		MarginBottom = "2.5cm",
+		OpenAfterRender = false,
 	},
 }
 
@@ -19,12 +20,11 @@ end
 
 local function render_pdf()
 	local buf_name = vim.fn.expand("%:p")
-	local buf_minus_ext = strip_extension(buf_name)
+	local pdf_name = strip_extension(buf_name) .. ".pdf"
 	local pandoc_cmd = "pandoc -s "
 		.. buf_name
 		.. " -o "
-		.. buf_minus_ext
-		.. ".pdf"
+		.. pdf_name
 		.. ' -V geometry:"left='
 		.. DefaultConfig.PDF.MarginLeft
 		.. ",right="
@@ -40,6 +40,9 @@ local function render_pdf()
 		return
 	end
 	print("PDF generated")
+	if DefaultConfig.PDF.OpenAfterRender then
+		vim.ui.open(pdf_name)
+	end
 end
 
 local function check_pandoc()
@@ -50,10 +53,12 @@ local function check_pandoc()
 	return true
 end
 
-function M.setup()
+function M.setup(opts)
 	if not check_pandoc() then
 		error("Pandoc plugin setup failed: pandoc not installed")
 	end
+	DefaultConfig = vim.tbl_deep_extend("force", DefaultConfig, opts or {})
+
 	vim.api.nvim_create_user_command("PandocRenderPDF", render_pdf, {})
 end
 
