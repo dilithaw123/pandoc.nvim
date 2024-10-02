@@ -6,6 +6,7 @@ local DefaultConfig = {
 		MarginRight = "2.5cm",
 		MarginTop = "2.5cm",
 		MarginBottom = "2.5cm",
+		ColorLinks = true,
 		OpenAfterRender = false,
 	},
 }
@@ -18,9 +19,7 @@ local function strip_extension(file_name)
 	return string.sub(file_name, 1, index_of_dot - 1)
 end
 
-local function render_pdf()
-	local buf_name = vim.fn.expand("%:p")
-	local pdf_name = strip_extension(buf_name) .. ".pdf"
+local function create_pdf_string(buf_name, pdf_name)
 	local pandoc_cmd = "pandoc -s "
 		.. buf_name
 		.. " -o "
@@ -34,7 +33,15 @@ local function render_pdf()
 		.. ",bottom="
 		.. DefaultConfig.PDF.MarginBottom
 		.. '"'
-	local output = vim.fn.system(pandoc_cmd)
+		.. " -V colorlinks="
+		.. (DefaultConfig.PDF.ColorLinks and "true" or "false")
+	return pandoc_cmd
+end
+
+local function render_pdf()
+	local buf_name = vim.fn.expand("%:p")
+	local pdf_name = strip_extension(buf_name) .. ".pdf"
+	local output = vim.fn.system(create_pdf_string(buf_name, pdf_name))
 	if output ~= "" then
 		print("Error: " .. output)
 		return

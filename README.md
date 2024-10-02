@@ -14,3 +14,4 @@
 | PDF.MarginTop       | Adjusts top margin of rendered pdf    | 2.5cm   |
 | PDF.MarginBottom    | Adjusts bottom margin of rendered pdf | 2.5cm   |
 | PDF.OpenAfterRender | Open rendered pdf in default app      | false   |
+| PDF.ColorLinks      | Color links in pdf                    | true    |
